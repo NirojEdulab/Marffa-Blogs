@@ -1,6 +1,30 @@
 import { Link } from "react-router-dom";
-const HorizontalBlogCard = ({ title, content, image, postId, author, createdAt }) => {
-  
+const randomColors = [
+  { bg: "bg-blue-100", text: "text-blue-600" },
+  { bg: "bg-green-100", text: "text-green-600" },
+  { bg: "bg-purple-100", text: "text-purple-600" },
+  { bg: "bg-orange-100", text: "text-orange-600" },
+  { bg: "bg-red-100", text: "text-red-600" },
+  { bg: "bg-yellow-100", text: "text-yellow-600" },
+  { bg: "bg-pink-100", text: "text-pink-600" },
+  { bg: "bg-gray-100", text: "text-gray-600" },
+];
+
+const HorizontalBlogCard = ({
+  title,
+  content,
+  image,
+  postId,
+  author,
+  createdAt,
+  categories,
+}) => {
+  const getRandomColor = () => {
+    // Select a random color from the array
+    const randomIndex = Math.floor(Math.random() * randomColors.length);
+    return randomColors[randomIndex];
+  };
+
   return (
     <Link to={`/post/${postId}`}>
       <div className="w-full rounded-lg overflow-hidden p-4 border">
@@ -22,27 +46,29 @@ const HorizontalBlogCard = ({ title, content, image, postId, author, createdAt }
                 {author} • {createdAt}
               </p>
 
-              <h2 className="text-2xl font-bold text-primary mb-3">
-                {title}
-              </h2>
+              <h2 className="text-2xl font-bold text-primary mb-3">{title}</h2>
 
               <p className="line-clamp-3 mb-4 text-muted-foreground">
                 {content}
               </p>
             </div>
 
-            {/* Categories */}
-            <div className="flex flex-wrap gap-2">
-              <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold">
-                Lifestyle
-              </span>
-              <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-semibold">
-                Shopping
-              </span>
-              <span className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-xs font-semibold">
-                Lifestyle
-              </span>
-            </div>
+            {/* Dynamic Categories */}
+            {categories && categories.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {categories.map((category, index) => {
+                  const { bg, text } = getRandomColor();
+                  return (
+                    <span
+                      key={index}
+                      className={`${bg} ${text} px-3 py-1 rounded-full text-xs font-bold`}
+                    >
+                      {category}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

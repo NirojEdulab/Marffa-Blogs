@@ -12,10 +12,11 @@ const RecentBlogs = ({ posts }) => {
           <BlogCard
             title={posts[0].title}
             content={posts[0].content}
-            image={posts[0].imageUrl} // Adjust according to your data structure
-            postId={posts[0]._id} // Passing the postId for routing
+            image={posts[0].imageUrl}
+            postId={posts[0]._id}
             author={posts[0].author}
             createdAt={posts[0].createdAt}
+            categories={posts[0].categories}
           />
         </div>
 
@@ -31,6 +32,7 @@ const RecentBlogs = ({ posts }) => {
                 postId={post._id}
                 author={post.author}
                 createdAt={post.createdAt}
+                categories={post.categories}
               />
             ))}
           </div>
