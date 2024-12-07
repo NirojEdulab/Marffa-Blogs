@@ -10,10 +10,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "./theme-provider";
 import { Input } from "./ui/input";
 import { SearchIcon } from "lucide-react";
+import { useAuth } from "@/context/authContext";
+import useAllPosts from "@/hooks/useAllPosts";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const theme = localStorage.getItem("vite-ui-theme") || "light";
+  const { isAuthenticated, logout } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const { posts, loading, error } = useAllPosts();
 
   const { setTheme } = useTheme();
 
@@ -40,6 +46,24 @@ const Header = () => {
     },
   };
 
+  const handleSearch = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term);
+
+    // Filter posts based on title
+    if (term) {
+      const filtered = posts.filter((post) =>
+        post.title.toLowerCase().includes(term.toLowerCase())
+      );
+      setFilteredPosts(filtered.slice(0, 10)); // Limit to 10 results
+    } else {
+      setFilteredPosts([]); // Clear filtered posts when search is empty
+    }
+  };
+
+  if (loading) return;
+  if (error) return;
+
   return (
     <header>
       <nav className="flex justify-between items-center gap-4 py-4 px-10 shadow-md">
@@ -47,26 +71,98 @@ const Header = () => {
           <div className="flex gap-2 justify-center items-center">
             <GiPaperBoat size={48} />
             <h4 className="text-xl font-bold text-primary hidden sm:block">
-              MARFFA BLOGS
+              MARRFA BLOGS
             </h4>
           </div>
         </Link>
-        <div className="grid w-full max-w-sm items-center gap-1.5">
-          <div className="relative">
-            <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground">
-              <SearchIcon className="h-4 w-4" />
+
+        {/* Search */}
+        {isAuthenticated && (
+          <div className="relative w-full max-w-sm">
+            <div className="relative">
+              <div className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground">
+                <SearchIcon className="h-4 w-4" />
+              </div>
+              <Input
+                id="search"
+                type="search"
+                placeholder="Search..."
+                className="w-full rounded-lg bg-background pl-8"
+                onChange={handleSearch}
+                value={searchTerm}
+              />
             </div>
-            <Input
-              id="search"
-              type="search"
-              placeholder="Search..."
-              className="w-full rounded-lg bg-background pl-8"
-            />
+
+            {/* Search Results */}
+            {searchTerm && filteredPosts.length > 0 && (
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                  {filteredPosts.map((post) => (
+                    <Link
+                      key={post._id}
+                      to={`/post/${post._id}`}
+                      onClick={() => setSearchTerm("")}
+                      className="block"
+                    >
+                      <div className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 group">
+                        <div className="flex items-center justify-between space-x-4">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-primary transition-colors">
+                              {post.title}
+                            </p>
+                            {post.author && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                by {post.author}
+                              </p>
+                            )}
+                          </div>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5 text-gray-400 dark:text-gray-500 group-hover:text-primary transition-colors flex-shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {filteredPosts.length === 10 && (
+                  <div className="px-4 py-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 text-center border-t border-gray-100 dark:border-gray-700">
+                    Showing top 10 results. Refine your search for more.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
         <div className="hidden justify-center items-center gap-2 sm:flex">
-          <Button variant="ghost">Login</Button>
-          <Button>Sign Up</Button>
+          {!isAuthenticated ? (
+            <>
+              <Link to={"/login"}>
+                <Button variant="ghost">Login</Button>
+              </Link>
+              <Link to={"/register"}>
+                <Button>Sign Up</Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" onClick={logout}>
+                Logout
+              </Button>
+            </>
+          )}
           <ModeToggle />
         </div>
         <button
@@ -102,21 +198,37 @@ const Header = () => {
                   Home
                 </Link>
 
-                <Link
-                  to="/"
-                  onClick={toggleMenu}
-                  className="text-3xl font-bold hover:text-primary transition-colors"
-                >
-                  Login
-                </Link>
+                {!isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/"
+                      onClick={toggleMenu}
+                      className="text-3xl font-bold hover:text-primary transition-colors"
+                    >
+                      Login
+                    </Link>
 
-                <Link
-                  to="/"
-                  onClick={toggleMenu}
-                  className="text-3xl font-bold hover:text-primary transition-colors"
-                >
-                  Sign Up
-                </Link>
+                    <Link
+                      to="/"
+                      onClick={toggleMenu}
+                      className="text-3xl font-bold hover:text-primary transition-colors"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <p
+                      className="text-3xl font-bold cursor-pointer"
+                      onClick={() => {
+                        logout();
+                        toggleMenu();
+                      }}
+                    >
+                      Logout
+                    </p>
+                  </>
+                )}
 
                 <Switch
                   checked={theme == "dark" ? true : false}
