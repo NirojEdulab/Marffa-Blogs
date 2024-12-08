@@ -116,7 +116,7 @@ const AllBlogPosts = () => {
       <div className="flex justify-center items-center mt-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {processedPosts.length > 0 ? (
-            processedPosts.map((post) => (
+            processedPosts.slice(0, 6).map((post) => (
               <BlogCard
                 key={post._id}
                 title={post.title}

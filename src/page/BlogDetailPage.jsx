@@ -26,6 +26,15 @@ const BlogDetailPage = () => {
     return randomColors[randomIndex];
   };
 
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
+  };
+
   if (loading || postsLoading) return <Loading />;
   if (error || postsError) return <p>{error || postsError}</p>;
 
@@ -42,7 +51,7 @@ const BlogDetailPage = () => {
           {/* Blog Meta Information */}
           <div className="flex items-center text-muted-foreground mb-4">
             <Calendar className="w-5 h-5 mr-2" />
-            <span className="mr-4">{post.createdAt}</span>
+            <span className="mr-4">{formatDate(post.createdAt)}</span>
             <BookOpen className="w-5 h-5 mr-2" />
             <span>{post.author}</span>
           </div>

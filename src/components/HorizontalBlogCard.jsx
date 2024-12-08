@@ -25,6 +25,15 @@ const HorizontalBlogCard = ({
     return randomColors[randomIndex];
   };
 
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
+  };
+
   return (
     <Link to={`/post/${postId}`}>
       <div className="w-full rounded-lg overflow-hidden p-4 border">
@@ -43,7 +52,7 @@ const HorizontalBlogCard = ({
             {/* Top Content */}
             <div>
               <p className="text-[#6941C6] font-medium text-sm mb-2">
-                {author} • {createdAt}
+                {author} • {formatDate(createdAt)}
               </p>
 
               <h2 className="text-2xl font-bold text-primary mb-3">{title}</h2>

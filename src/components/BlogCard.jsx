@@ -28,6 +28,15 @@ const BlogCard = ({
     return randomColors[randomIndex];
   };
 
+  const formatDate = (isoDate) => {
+    const date = new Date(isoDate);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
+  };
+
   return (
     <Link to={`/post/${postId}`}>
       <section className="w-full p-4 border rounded-lg text-start h-full">
@@ -37,7 +46,7 @@ const BlogCard = ({
           className="rounded-lg w-full h-auto object-cover"
         />
         <p className="font-semibold text-base text-[#6941C6] mt-4">
-          {author} • {createdAt}
+          {author} • {formatDate(createdAt)}
         </p>
         <div className="flex gap-2 mt-2 flex-col">
           <span className="flex justify-between items-center">

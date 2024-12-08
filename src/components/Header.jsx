@@ -98,7 +98,7 @@ const Header = () => {
 
             {/* Search Results */}
             {searchTerm && filteredPosts.length > 0 && (
-              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden max-h-64 overflow-y-auto">
+              <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden overflow-y-auto">
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
                   {filteredPosts.map((post) => (
                     <Link
@@ -201,7 +201,7 @@ const Header = () => {
                   <>
                     <Link
                       to="/"
-                      onClick={toggleMenu}
+                      onClick={login}
                       className="text-3xl font-bold hover:text-primary transition-colors"
                     >
                       Login
@@ -209,7 +209,7 @@ const Header = () => {
 
                     <Link
                       to="/"
-                      onClick={toggleMenu}
+                      onClick={register}
                       className="text-3xl font-bold hover:text-primary transition-colors"
                     >
                       Sign Up
