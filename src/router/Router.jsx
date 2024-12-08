@@ -1,103 +1,69 @@
-import AllBlogPosts from "@/components/AllBlogPosts";
-import Header from "@/components/Header";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
+
 import HomePage from "@/page/HomePage";
-import NoPageFound from "@/page/NoPageFound";
+import AllBlogPosts from "@/components/AllBlogPosts";
 import BlogDetailPage from "@/page/BlogDetailPage";
-import LoginPage from "@/page/LoginPage";
-import RegisterPage from "@/page/RegisterPage";
-import { BrowserRouter, matchPath, Route, Routes, useLocation, Navigate } from "react-router-dom";
-import { useAuth } from "@/context/authContext";
+import NoPageFound from "@/page/NoPageFound";
+import Header from "@/components/Header";
+import Loading from "@/components/Loading";
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useKindeAuth();
+
+  if (isLoading) {
+    // Optional: Add a loading spinner or placeholder
+    return <Loading />;
+  }
+
+  if (!isAuthenticated) {
+    // Redirect to home if not authenticated
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 const Router = () => {
-  return (
-    <HeaderWrapper>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        
-        {/* Protected Blog Routes */}
-        <Route
-          path="/post/:postId"
-          element={
-            <ProtectedRoute allowHome={true}>
-              <BlogDetailPage />
-            </ProtectedRoute>
-          }
-        />
+  const { isLoading } = useKindeAuth();
+  if(isLoading){
+    return <Loading />
+  }
 
+  return (
+    <>
+      {/* Show header only when authenticated */}
+      <Header />
+
+      <Routes>
+        {/* Public Route */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* Protected Routes */}
         <Route
           path="/posts"
           element={
-            <ProtectedRoute allowHome={true}>
+            <ProtectedRoute>
               <AllBlogPosts />
             </ProtectedRoute>
           }
         />
 
-        {/* Authentication Routes */}
         <Route
-          path="/login"
+          path="/post/:postId"
           element={
-            <GuestRoute>
-              <LoginPage />
-            </GuestRoute>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <GuestRoute>
-              <RegisterPage />
-            </GuestRoute>
+            <ProtectedRoute>
+              <BlogDetailPage />
+            </ProtectedRoute>
           }
         />
 
+        {/* 404 Route */}
         <Route path="*" element={<NoPageFound />} />
       </Routes>
-    </HeaderWrapper>
-  );
-};
-
-// A wrapper to conditionally render the Header
-const HeaderWrapper = ({ children }) => {
-  const location = useLocation();
-  const routesWithHeader = ["/", "/posts", "/post"];
-  const showHeader = routesWithHeader.some((route) =>
-    matchPath({ path: route, end: false }, location.pathname)
-  );
-
-  return (
-    <>
-      {showHeader && <Header />}
-      {children}
     </>
   );
-};
-
-// Protected Route to check authentication
-const ProtectedRoute = ({ children, allowHome = false }) => {
-  const { isAuthenticated } = useAuth();
-  const location = useLocation();
-  
-  if (!isAuthenticated) {
-    // If not authenticated and not on home page, redirect to login
-    if (!allowHome || location.pathname !== "/") {
-      return <Navigate to="/login" />;
-    }
-  }
-
-  return children;
-};
-
-// Route for guests (not logged in users)
-const GuestRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
-  
-  if (isAuthenticated) {
-    // If authenticated, redirect to home
-    return <Navigate to="/" />;
-  }
-
-  return children;
 };
 
 export default Router;

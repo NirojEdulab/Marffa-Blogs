@@ -1,4 +1,5 @@
 import { AlertTriangle, Home } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const NoPageFound = () => {
   return (
@@ -42,8 +43,8 @@ const NoPageFound = () => {
           justify-center 
           space-y-3 md:space-y-0 md:space-x-4"
         >
-          <button
-            onClick={() => (window.location.href = "/")}
+          <Link
+            to={"/"}
             className="flex items-center justify-center 
               bg-blue-500 text-white 
               dark:bg-blue-600 
@@ -54,7 +55,7 @@ const NoPageFound = () => {
           >
             <Home className="mr-2" size={20} />
             Return Home
-          </button>
+          </Link>
 
           <button
             onClick={() => window.history.back()}

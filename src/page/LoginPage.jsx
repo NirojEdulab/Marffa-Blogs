@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/context/authContext.jsx";
 import { Navigate, useNavigate } from "react-router-dom"; // Import Navigate for redirect
 import axios from "axios";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
 const LoginPage = () => {
   const { isAuthenticated, login } = useAuth();
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const {getToken} = useKindeAuth();
   
   // If user is already authenticated, redirect to home page
   if (isAuthenticated) {
@@ -18,13 +20,18 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/auth/login`, { email, password });
-      const { accessToken, refreshToken } = response.data;
+      const authAccessToken = await getToken();
+      const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/auth/login`, {
+        headers: {
+          Authorization: `Bearer ${authAccessToken}`
+        }
+      }, { email, password });
+      // const { accessToken, refreshToken } = response.data;
 
-      // Save the tokens to localStorage
-      await login(accessToken, refreshToken);
+      // // Save the tokens to localStorage
+      // await login(accessToken, refreshToken);
 
-      navigate("/"); // Redirect to home page after successful login
+      // navigate("/"); // Redirect to home page after successful login
     } catch (err) {
       setError("Invalid credentials");
     }

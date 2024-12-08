@@ -12,14 +12,17 @@ import { Input } from "./ui/input";
 import { SearchIcon } from "lucide-react";
 import { useAuth } from "@/context/authContext";
 import useAllPosts from "@/hooks/useAllPosts";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const theme = localStorage.getItem("vite-ui-theme") || "light";
-  const { isAuthenticated, logout } = useAuth();
+  // const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated } = useKindeAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPosts, setFilteredPosts] = useState([]);
   const { posts, loading, error } = useAllPosts();
+  const { login, register, logout } = useKindeAuth();
 
   const { setTheme } = useTheme();
 
@@ -149,12 +152,8 @@ const Header = () => {
         <div className="hidden justify-center items-center gap-2 sm:flex">
           {!isAuthenticated ? (
             <>
-              <Link to={"/login"}>
-                <Button variant="ghost">Login</Button>
-              </Link>
-              <Link to={"/register"}>
-                <Button>Sign Up</Button>
-              </Link>
+              <Button onClick={register}>Register</Button>
+              <Button onClick={login} variant="ghost">Log In</Button>
             </>
           ) : (
             <>
